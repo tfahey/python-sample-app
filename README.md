@@ -1,6 +1,6 @@
 # Python Sample App
 
-[Python Sample App](https://github.com/becosta/python-sample-app) is a starter template for new python applications.
+[Python Sample App](https://github.com/tfahey/python-sample-app) is a starter template for new python applications.
 You can clone it, edit some basic stuff and get started on your new app.
 
 ## Installing
@@ -13,12 +13,12 @@ your_main_package_name=<main_package_name>
 
 Then clone or download this repository:
 ```sh
-$ git clone https://github.com/becosta/python-sample-app.git
+$ git clone https://github.com/tfahey/python-sample-app.git
 $ rm -rf python-sample-app/.git/
 ```
 Or:
 ```sh
-$ curl -LkSs https://api.github.com/repos/becosta/python-sample-app/tarball | tar -xvzp -C . ; mv becosta-python-sample-app-* python-sample-app
+$ curl -LkSs https://api.github.com/repos/tfahey/python-sample-app/tarball | tar -xvzp -C . ; mv tfahey-python-sample-app-* python-sample-app
 ```
 
 Next thing to do is to rename the project directory (python-sample-app) to your project's name.
