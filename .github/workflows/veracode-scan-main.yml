@@ -56,7 +56,7 @@ jobs:
           # createprofile
           #createprofile: # default is true
           # filepath
-          filepath: '.'
+          filepath: 'result.zip'
           # version
           #version: # default is Scan from Github job: ${{ github.run_id }}
           # vid
