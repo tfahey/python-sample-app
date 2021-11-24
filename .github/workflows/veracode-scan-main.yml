@@ -43,7 +43,20 @@ jobs:
           # dest: # optional, default is result.zip
           # Whether to add subdirectories to simply zip all files to the root
           #recursive: # optional, default is true
-      - name: Veracode Upload And Scan
+      - uses: actions/upload-artifact@master
+        with:
+          name: python-package
+          path: result.zip
+
+  # Veracode Upload And Scan
+  veracode:
+    runs-on: ubuntu-latest
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      - uses: actions/download-artifact@master
+        with:
+          name: python-package
       - uses: actions/setup-java@v1 # Make java accessible on path so the uploadandscan action can run.
         with: 
           java-version: '8'
