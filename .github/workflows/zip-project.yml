@@ -1,0 +1,42 @@
+# This workflow will zip python files in the workspace that match the expression
+
+name: Zip Python Files in the Workspace
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [ master ]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a job to build and submit pipeline scan, you will need to customize the build process accordingly and make sure the artifact you build is used as the file input to the pipeline scan file parameter
+  build-and-pipeline-scan:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    steps:
+
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it and copies all sources into ZIP file for submitting for analysis. Replace this section with your applications build steps
+    - uses: actions/checkout@v2
+      with:
+        repository: ''
+
+      # Runs a set of commands using the runners shell
+    - name: Print working directory and list contents
+      run: |
+        pwd
+        ls -al
+        cd python_sample_app
+        ls -al
+          
+    - uses: papeloto/action-zip@v1
+      with:
+        files: python_sample_app/*.py
+        recursive: true
+        dest: veracode-pipeline-scan-results-to-sarif.zip
+
+    - uses: actions/upload-artifact@v1
+      with:
+        name: my-artifact
+        path: veracode-pipeline-scan-results-to-sarif.zip
