@@ -30,7 +30,7 @@ jobs:
           
     - uses: papeloto/action-zip@v1
       with:
-        files: python-sample-app/*.py
+        files: python_sample_app/*.py
         recursive: true
         dest: veracode-pipeline-scan-results-to-sarif.zip
 
