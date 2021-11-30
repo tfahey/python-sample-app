@@ -35,6 +35,8 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
+
+      # Copy files from repository to docker container so the next uploadandscan action can access them.
       - uses: actions/download-artifact@master
         with:
           name: python-package
@@ -42,10 +44,6 @@ jobs:
       - uses: actions/setup-java@v1 # Make java accessible on path so the uploadandscan action can run.
         with: 
           java-version: '8'
-
-      - uses: actions/download-artifact@v2 # Copy files from repository to docker container so the next uploadandscan action can access them.
-        with:
-          name: python-package
 
         # You may pin to the exact commit or the version.
         # uses: veracode/veracode-uploadandscan-action@c5e63c8383debb26a0d48250eab75d94327635ba
@@ -56,7 +54,7 @@ jobs:
           # createprofile
           #createprofile: # default is true
           # filepath
-          filepath: 'release.zip'
+          filepath: release.zip
           # version
           #version: # default is Scan from Github job: ${{ github.run_id }}
           # vid
@@ -75,7 +73,7 @@ jobs:
           #exclude: # optional
           # modules to include in module selection
           #include: # optional
-          include: 'release.zip'
+          #include:
           # business criticality - policy selection
           #criticality: # optional
           criticality: 'High'
