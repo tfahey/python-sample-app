@@ -81,19 +81,23 @@ def getCWE(cwe):
 
 
 def getFindings(appGUID):
+    # For the given GUID, retrieve the SCA findings
     global missingRecommendations
     aFindingsList = ""
-    # For the given GUID, retrieve the SCA findings
-    # http --auth-type=veracode_hmac "https://api.veracode.com/appsec/v2/applications/c85f4991-0c11-433e-a380-42b11f35cd47/findings?scan_type=SCA" | tee sca_findings.txt
     findingsURL = "https://api.veracode.com/appsec/v2/applications/" + appGUID + "/findings?scan_type=SCA"
     getFindingsJSON = subprocess.run(['http', '--ignore-stdin', '--auth-type=veracode_hmac',
                                       findingsURL],
                                      capture_output=True)
     print(findingsURL)
     findingsStdout = getFindingsJSON.stdout
-    # print(findingsStdout)
+    findingsStderr = getFindingsJSON.stderr
     if not len(findingsStdout):
-        print("There was an unknown error calling the findings API")
+        if "Request timed out" in findingsStderr.decode():
+            print("There was an http error calling the findings API")
+            print(findingsStderr.decode())
+        else:
+            print("There was an unknown error calling the findings API")
+            print(findingsStderr.decode())
         return aFindingsList
     print("The list of findings for", appGUID, "have been retrieved")
     findingsJSON = {"_embedded": {"findings": "aFinding"}}
@@ -107,7 +111,6 @@ def getFindings(appGUID):
     except KeyError:
         print("This application has no SCA findings")
         return aFindingsList
-    # print(embeddedFindingsDict.keys())
     # iterate(embeddedFindingsDict)
     aFindingsList = embeddedFindingsDict['findings']
     print("The findings list has", len(aFindingsList), "element(s)")
@@ -122,7 +125,6 @@ def getFindings(appGUID):
             getCWE(cwe)
         else:
             pass
-            # print("False, does not contain a cwe object")
         if 'cve' in findingDetails:
             #print("True, contains a cve object")
             #cve = findingDetails.get('cve')
@@ -130,24 +132,15 @@ def getFindings(appGUID):
             pass
         else:
             pass
-            # print("False, does not contain a cve object")
     print("There are", cweFindings, "SCA CWE findings for this application")
     return aFindingsList
 
 
 def applicationMenu(anApplicationList):
-
     applicationName = ""
-
-    # print("*" * 20, "Menu", "*" * 20)
-    #applications[] = anApplicationList
-
     appChoiceString = ("*" * 20) + " Menu " + ("*" * 20) + "\n\n"
     for index, application in enumerate(anApplicationList,1):
-        # for index, choice in enumerate(choices, 1):
-        # print(application)
         appChoiceString += (" " * 16) + str(index) + ":\t" + application['guid'] + "\t" + application['profile']['name'] + "\n"
-    # print(appChoiceString)
     appChoiceString += "            Please enter your choice: "
     choice = input(appChoiceString)
     try:
@@ -158,61 +151,25 @@ def applicationMenu(anApplicationList):
     return applicationName
 
 
-
 def getApplicationGUID():
     getApplicationJSON = subprocess.run(
         ['http', '--ignore-stdin', '--auth-type=veracode_hmac', 'https://api.veracode.com/appsec/v1/applications/'],
         capture_output=True)
     print("The list of applications has been retrieved")
     applicationsJSON = json.loads(getApplicationJSON.stdout)
-    # print(type(getApplicationJSON.stdout))
-    # print(type(applicationsJSON))
-    # print(applicationsJSON.keys())
     embeddedApplicationsDict = applicationsJSON['_embedded']
-    # print(embeddedApplicationsDict.keys())
     # iterate(embeddedApplicationsDict)
     anApplicationList = embeddedApplicationsDict['applications']
-    # print(anApplicationList[0])
     print("The application list has ", len(anApplicationList), "elements")
     # [iterate(app) for app in anApplicationList]
-    # [print(app['guid']) for app in anApplicationList]
     myAppName = applicationMenu(anApplicationList)
     print("The selected application is", myAppName)
-    # myAppName = 'VerademoTF'
-    # myAppName = 'Verademo-AzureDevOps'
     for app in anApplicationList:
-        # print(app['profile']['name'], app['guid'])
-        # print("The app profile name is type: ", type(app['profile']['name']))
         appProfileName = app['profile']['name']
-        # if appProfileName == myAppName :
-        #    print("The GUID is ", app['guid'])
-        if app['profile']['name'] == myAppName:
-            print("For application name", app['profile']['name'], "the GUID is", app['guid'])
+        if appProfileName == myAppName:
+            print("For application name", appProfileName, "the GUID is", app['guid'])
             myAppGUID = app['guid']
     return myAppGUID
-
-
-#        print(finding['finding_details']['cwe']['name'], finding['finding_details']['cwe']['href'])
-        #print("The app profile name is type: ", type(app['profile']['name']))
-#        appProfileName = finding['profile']['name']
-        #if appProfileName == myAppName :
-        #    print("The GUID is ", app['guid'])
-#        if finding['profile']['name'] == myAppName:
-#            print("For application name", finding['profile']['name'], "The GUID is", finding['guid'])
-#            myFindingGUID = finding['guid']
-
-
-    # Iterating all the fields of the JSON
-#    for element in embedded_dict:
-        # If Json Field value is a Nested Json
-#        if (isinstance(embedded_dict[element], dict)):
-#            checkDict(embedded_dict[element], element)
-        # If Json Field value is a list
-#        elif (isinstance(embedded_dict[element], list)):
-#            checkList(embedded_dict[element], element)
-        # If Json Field value is a string
-#        elif (isinstance(embedded_dict[element], str)):
-#            printField(embedded_dict[element], element)
 
 
 if __name__ == '__main__':
