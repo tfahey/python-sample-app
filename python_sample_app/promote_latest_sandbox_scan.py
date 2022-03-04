@@ -57,14 +57,9 @@ def getApplicationGUID():
         capture_output=True)
     print("The list of applications has been retrieved")
     applicationsJSON = json.loads(getApplicationJSON.stdout)
-    # print(type(getApplicationJSON.stdout))
-    # print(type(applicationsJSON))
-    # print(applicationsJSON.keys())
     embeddedApplicationsDict = applicationsJSON['_embedded']
-    # print(embeddedApplicationsDict.keys())
     # iterate(embeddedApplicationsDict)
     anApplicationList = embeddedApplicationsDict['applications']
-    # print(anApplicationList[0])
     print("The application list has ", len(anApplicationList), "elements")
     # [iterate(app) for app in anApplicationList]
     # [print(app['guid']) for app in anApplicationList]
@@ -83,59 +78,25 @@ def getApplicationGUID():
 
 def getSandboxes(appGUID):
     # For the given GUID, get a list of sandboxes
-    # http --auth-type=veracode_hmac "https://api.veracode.com/appsec/v2/applications/c85f4991-0c11-433e-a380-42b11f35cd47/findings?scan_type=SCA" | tee sca_findings.txt
     apiUrl = "https://api.veracode.com/appsec/v1/applications/" + appGUID + "/sandboxes"
-    # print(apiUrl)
     getSandboxesJSON = subprocess.run(['http', '--ignore-stdin', '--auth-type=veracode_hmac',
                                        apiUrl],
                                       capture_output=True)
     print("The list of sandboxes have been retrieved")
     sandboxesJSON = json.loads(getSandboxesJSON.stdout)
-    # iterate(sandboxesJSON)
     embeddedSandboxesDict = sandboxesJSON['_embedded']
-    # print(embeddedSandboxesDict.keys())
-    # iterate(embeddedSandboxesDict)
     aSandboxList = embeddedSandboxesDict['sandboxes']
     print("The sandbox list has ", len(aSandboxList), "elements")
     mySandboxName = 'Eclipse'
     for sandbox in aSandboxList:
-        # print(sandbox['finding_details'])
-        # print("The keys for sandbox details are", sandbox['finding_details'].keys())
-        # iterate(sandbox['finding_details'])
-        # findingDetails = sandbox['finding_details']
-        # print(sandbox['name'], sandbox['guid'])
         if sandbox['name'] == mySandboxName:
             print("For sandbox name", mySandboxName, "The GUID is", sandbox['guid'])
             mySandboxGUID = sandbox['guid']
     return mySandboxGUID
 
 
-#        print(finding['finding_details']['cwe']['name'], finding['finding_details']['cwe']['href'])
-        #print("The app profile name is type: ", type(app['profile']['name']))
-#        appProfileName = finding['profile']['name']
-        #if appProfileName == myAppName :
-        #    print("The GUID is ", app['guid'])
-#        if finding['profile']['name'] == myAppName:
-#            print("For application name", finding['profile']['name'], "The GUID is", finding['guid'])
-#            myFindingGUID = finding['guid']
-
-
-    # Iterating all the fields of the JSON
-#    for element in embedded_dict:
-        # If Json Field value is a Nested Json
-#        if (isinstance(embedded_dict[element], dict)):
-#            checkDict(embedded_dict[element], element)
-        # If Json Field value is a list
-#        elif (isinstance(embedded_dict[element], list)):
-#            checkList(embedded_dict[element], element)
-        # If Json Field value is a string
-#        elif (isinstance(embedded_dict[element], str)):
-#            printField(embedded_dict[element], element)
-
-
 def promoteBuild(appGUID, sandboxGUID):
     # For the given GUID, get a list of sandboxes
-    # http --auth-type=veracode_hmac POST "https://api.veracode.com/appsec/v1/applications/{applicationGuid}/sandboxes/{sandboxGuid}/promote"
     apiUrl = "https://api.veracode.com/appsec/v1/applications/" + appGUID + "/sandboxes/" + sandboxGUID + "/promote"
     promoteBuildJSON = subprocess.run(['http', '--ignore-stdin', '--auth-type=veracode_hmac',
                                        'POST',
@@ -148,19 +109,6 @@ def promoteBuild(appGUID, sandboxGUID):
     embeddedSandboxesDict = promoteJSON['_embedded']
     print(embeddedSandboxesDict.keys())
     iterate(embeddedSandboxesDict)
-#    aSandboxList = embeddedSandboxesDict['sandboxes']
-#    print("The sandbox list has ", len(aSandboxList), "elements")
-#    mySandboxName = 'Eclipse'
-#    for sandbox in aSandboxList:
-        # print(sandbox['finding_details'])
-        # print("The keys for sandbox details are", sandbox['finding_details'].keys())
-        # iterate(sandbox['finding_details'])
-        # findingDetails = sandbox['finding_details']
-        # print(sandbox['name'], sandbox['guid'])
-#        if sandbox['name'] == mySandboxName:
-#            print("For sandbox name", mySandboxName, "The GUID is", sandbox['guid'])
-#            mySandboxGUID = sandbox['guid']
-#    return mySandboxGUID
     pass
 
 
@@ -170,7 +118,6 @@ def main():
     sandboxGUID = getSandboxes(appGUID)
 
     promoteBuild(appGUID, sandboxGUID)
-#    getBuildsForSandbox(appGUID, sandbox)
 
 
 if __name__ == '__main__':
